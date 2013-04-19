@@ -28,12 +28,12 @@ project
 
 # Declare the three extension modules.  You can specify multiple
 # source files after the colon separated by spaces.
-python-extension @@BINARY@@ : @@CPP@@.cpp ;
+python-extension intersect : intersect.cpp ;
 
 # Put the extension and Boost.Python DLL in the current directory, so
 # that running script by hand works.
 install convenient_copy 
-  : @@BINARY@@ 
+  : intersect 
   : <install-dependencies>on <install-type>SHARED_LIB <install-type>PYTHON_EXTENSION 
     <location>. 
   ;
@@ -47,4 +47,4 @@ local rule run-test ( test-name : sources + )
 }
 
 # Declare test targets
-run-test @@PROJECT@@ : @@BINARY@@ @@PYTHON@@.py ;
+run-test intersect_project : intersect intersect.py ;
