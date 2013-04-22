@@ -24,6 +24,7 @@ project
         <library>/boost/python//boost_python
         <library>/Users/saratt/Desktop/pyboost/thirdparty/boost_numpy/build/lib/libboost_numpy.dylib
         <include>/usr/local/include
+        <library>/Users/saratt/Desktop/pyboost/thirdparty/boost_1_52_0/stage/lib/libboost_serialization.a
         ;
 
 # Declare the three extension modules.  You can specify multiple

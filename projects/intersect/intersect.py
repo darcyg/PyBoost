@@ -8,16 +8,29 @@ import numpy as np
         #Keypoint(7.0, 8.0, 9.0)]
 
 # construct image
-data = np.array([10, 20, 30, 40, 50, 60], dtype=float)
+data = np.array([10, 20, 30, 40, 50, 60], dtype=np.uint8)
 image = Image(3, 2, data)
+image.fuck()
+
 #image = Image(3, 2)
+# keypoints[2] = Keypoint(1000,2000,3000)
 
 # detect keypoints
-keypoints = Detector.detect(image)
+detector = Detector()
+
+detector.detect(image)
+keypoints = detector.keypoints
+    
+filename = "keypoints.bin"
+detector.saveKeypoints(filename)
+
+keypoints[2] = Keypoint(1000,2000,3000)
+
+detector.loadKeypoints(filename)
+
+keypoints = detector.keypoints
 
 for kp in keypoints:
     print kp
 
-
-
-
+print data

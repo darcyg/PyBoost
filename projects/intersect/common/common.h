@@ -8,6 +8,13 @@
 #include <assert.h>
 #include <boost/format.hpp>
 #include <boost/numpy.hpp>
+#include <fstream>
+
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
 
 using namespace std;
 
@@ -20,6 +27,13 @@ namespace intersect {
             float x;
             float y;
             float scale;
+
+            //Keypoint() : Keypoint(0.0f, 0.0f, 0.0f) {}
+            Keypoint() {
+                x = 0.0f;
+                y = 0.0f;
+                scale = 0.0f;
+            }
 
             Keypoint(float xx, float yy, float sscale) {
                 x = xx;
@@ -42,9 +56,33 @@ namespace intersect {
             void print() const {
                 std::cout << boost::format("Keypoint(%s)") % this->toString() << std::endl;
             }
+
+        private:
+
+            /*
+            friend class boost::serialization::access;
+            template <typename Archive> void serialize(Archive &ar, const unsigned int version) {
+                ar & x;
+                ar & y;
+                ar & scale;
+            }
+            */
     };
     typedef std::vector<Keypoint> KeypointVector;
 
+    /*---- Just for reference
+    namespace boost {
+        namespace serialization {
+
+            template<class Archive>
+                void serialize(Archive & ar, VFP::Common::ImageId & i, const unsigned int version)
+                {
+                    ar & i.callsign;
+                    ar & i.msTime;
+                }
+        }
+    }
+    */
 
     // Holds Image Data
     // -----------------------------------
@@ -52,7 +90,7 @@ namespace intersect {
         public:
             int width;
             int height;
-            float* data;
+            uint8_t* data;
 
             //Image(int wwidth, int hheight) {
             Image(int wwidth, int hheight, boost::numpy::ndarray const &numpyData) {
@@ -61,12 +99,18 @@ namespace intersect {
                 getData(numpyData);
             } 
 
+            void fuck() {
+                //std::string str = (boost::format("X: %s, Y: %s, Scale: %s") % x % y % scale).str();
+                
+                data[3] = 100; 
+            }
+
             ~Image() {}
 
         private:
 
             void getData(boost::numpy::ndarray const &numpyData) {
-                if (numpyData.get_dtype() != boost::numpy::dtype::get_builtin<double>()) {
+                if (numpyData.get_dtype() != boost::numpy::dtype::get_builtin<uint8_t>()) {
                     PyErr_SetString(PyExc_TypeError, "Incorrect array data type");
                     boost::python::throw_error_already_set();
                 }
@@ -76,24 +120,11 @@ namespace intersect {
                     boost::python::throw_error_already_set();
                 }
                 */
-                data = reinterpret_cast<float*>(numpyData.get_data());
+                data = reinterpret_cast<uint8_t*>(numpyData.get_data());
                  
             }
 
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }  // namespace intersect
