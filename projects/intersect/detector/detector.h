@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ios>
 #include <fstream>
+#include <sstream>
 #include <assert.h>
 #include <boost/format.hpp>
 #include <boost/python.hpp>
@@ -31,6 +32,11 @@ namespace intersect {
             std::vector<Keypoint> keypoints;
 
             ~Detector() {}
+
+            void fakeDetect(std::vector<Keypoint> &kps) {
+                keypoints = kps;
+            }
+
             void detect(Image &image) {
                 //return detectKeypoints(image);
                 // Fake it for now 
@@ -41,22 +47,40 @@ namespace intersect {
                 }
             }
 
-            void saveKeypoints(string filename) {
+            std::string saveKeypoints() {
+                // serializes into str
+                std::ostringstream oss;
+                boost::archive::binary_oarchive oa(oss);
+                oa << keypoints;
+
+                return oss.str();
+                
+            }
+
+            void loadKeypoints(std::string load) {
+                // serializes into str
+                std::istringstream oss(load);
+                boost::archive::binary_iarchive ia(oss);
+                ia >> keypoints;
+                
+            }
+
+            void saveKeypointsToFile(string filename) {
                 cout << "Saving Keypoints to file " << filename << endl;
                 std::ofstream f(filename.c_str(), std::ios::binary);
                 boost::archive::binary_oarchive oa(f);
 
                 // save class state to archive
-                //oa << keypoints;
+                oa << keypoints;
             }
 
-            void loadKeypoints(string filename) {
+            void loadKeypointsFromFile(string filename) {
                 cout << "Loading Keypoints from file " << filename << endl;
                 std::ifstream ifs(filename.c_str(), std::ios::binary);
-                //boost::archive::binary_iarchive ia(ifs);
+                boost::archive::binary_iarchive ia(ifs);
 
                 // read class state from archive
-                //ia >> keypoints;
+                ia >> keypoints;
             }
 
             /*
@@ -87,18 +111,32 @@ namespace intersect {
 
 }  // namespace pyboost
 
+/*
 namespace boost {
 namespace serialization {
     template <class Archive> void serialize(Archive & ar, intersect::Keypoint & k, const unsigned int version) {
         ar & k.x;
         ar & k.y;
         ar & k.scale;
+
+        ar & k.scale1;
+        ar & k.scale2;
+        ar & k.scale3;
+
+        ar & k.s1;
+        ar & k.s2;
+        ar & k.s3;
+        ar & k.s4;
+        ar & k.s5;
+        ar & k.s6;
+
     }
 
 
     
 }
 }
+*/
 
 #endif  // DETECTOR_DETECTOR_H
 

@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <boost/format.hpp>
 #include <boost/numpy.hpp>
+#include <boost/python.hpp>
 #include <fstream>
 
 #include <boost/archive/text_oarchive.hpp>
@@ -15,6 +16,10 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
+
+extern "C" {
+#include "hiredis.h"
+}
 
 using namespace std;
 
@@ -27,6 +32,22 @@ namespace intersect {
             float x;
             float y;
             float scale;
+
+            float scale1;
+            float scale2;
+            float scale3;
+
+            float s1;
+            float s2;
+            float s3;
+            float s4;
+            float s5;
+            float s6;
+
+            /*float s7;*/
+            /*float s8;*/
+            /*float s9;*/
+            /*float s10;*/
 
             //Keypoint() : Keypoint(0.0f, 0.0f, 0.0f) {}
             Keypoint() {
@@ -59,14 +80,22 @@ namespace intersect {
 
         private:
 
-            /*
             friend class boost::serialization::access;
             template <typename Archive> void serialize(Archive &ar, const unsigned int version) {
                 ar & x;
                 ar & y;
                 ar & scale;
+
+                ar & scale1;
+                ar & scale2;
+                ar & scale3;
+                ar & s1;
+                ar & s2;
+                ar & s3;
+                ar & s4;
+                ar & s5;
+                ar & s6;
             }
-            */
     };
     typedef std::vector<Keypoint> KeypointVector;
 
@@ -92,6 +121,32 @@ namespace intersect {
             int height;
             uint8_t* data;
 
+            const char* getCharData() {
+                //return (char*)data;
+                return (char*)data;
+            }
+
+            PyObject* getBuffer() {
+                return PyBuffer_FromMemory((void*)data, width*height);
+            }
+
+            void saveToRedis(std::string key) {
+
+                int database = 0;
+
+                // Connect to Redis
+                redisContext *m_context;
+                m_context = redisConnect("127.0.0.1", 6379);
+
+                // select DB
+                redisReply *reply = (redisReply*) redisCommand(m_context, "SELECT %d", database);
+                freeReplyObject(reply);
+
+                // insert into DB
+                reply = (redisReply*) redisCommand(m_context, "SET %b %b", key.c_str(), key.length(), (char*)data, width*height);
+                 
+            }
+
             //Image(int wwidth, int hheight) {
             Image(int wwidth, int hheight, boost::numpy::ndarray const &numpyData) {
                 width = wwidth;
@@ -107,7 +162,32 @@ namespace intersect {
 
             ~Image() {}
 
+            /*
+            std::string saveKeypoints() {
+                // serializes into str
+                std::ostringstream oss;
+                boost::archive::binary_oarchive oa(oss);
+                oa << keypoints;
+
+                return oss.str();
+                
+            }
+
+            void loadKeypoints(std::string load) {
+                // serializes into str
+                std::istringstream oss(load);
+                boost::archive::binary_iarchive ia(oss);
+                ia >> keypoints;
+                
+            }
+            */
+
         private:
+
+            friend class boost::serialization::access;
+            template <typename Archive> void serialize(Archive &ar, const unsigned int version) {
+                 
+            }
 
             void getData(boost::numpy::ndarray const &numpyData) {
                 if (numpyData.get_dtype() != boost::numpy::dtype::get_builtin<uint8_t>()) {
@@ -121,6 +201,7 @@ namespace intersect {
                 }
                 */
                 data = reinterpret_cast<uint8_t*>(numpyData.get_data());
+
                  
             }
 

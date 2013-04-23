@@ -22,11 +22,13 @@ detector.detect(image)
 keypoints = detector.keypoints
     
 filename = "keypoints.bin"
-detector.saveKeypoints(filename)
+#detector.saveKeypoints(filename)
+value = detector.saveKeypoints()
 
 keypoints[2] = Keypoint(1000,2000,3000)
 
-detector.loadKeypoints(filename)
+#detector.loadKeypoints(filename)
+detector.loadKeypoints(value)
 
 keypoints = detector.keypoints
 
