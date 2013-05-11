@@ -9,34 +9,6 @@ import shlex
 import shutil
 from pprint import pprint
 
-def get_args():
-    def usage():
-        print "Command Line Interface for VFP Index and Query\n"
-        print "SAMPLE USAGE: ./setup.py -p <project_name>"
-        print "Ex: ./setup.py -p helloWorld\n"
-        print "-p <project_name>"
-        print ""
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "p:h", ["project=", "indexdir=", "monitordir=", "help"])
-    except:
-        usage()
-        exit()
-
-    # init defaults
-    project_name = None 
-
-    for o,a in opts:
-        if o in ("-p", "--project"):
-            project_name = a 
-        elif o in ("-h", "--help"):
-            usage()
-            exit()
-
-    if not project_name:
-        raise Exception("Must Specify Project Name")
-
-    return project_name
 
 def create_dir(dirname):
     if os.path.exists(dirname):
@@ -69,9 +41,57 @@ def process_files(project_name, files, names):
                 ]
         sed(filename, rlist)
 
+def get_args():
+    def usage():
+        print "Command Line Interface for VFP Index and Query\n"
+        print "SAMPLE USAGE: ./setup.py -p <project_name>"
+        print "Ex: ./setup.py -p helloWorld\n"
+        print "-p <project_name>"
+        print ""
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "p:b:j:h", ["project=", "boostdir=", "bjamdir=", "help"])
+    except:
+        usage()
+        exit()
+
+    # init defaults
+    project_name = None 
+    boost_dir = "/Users/saratt/lm-vfp/intersect/thirdparty/boost_1_52_0"
+    bjam_dir = None
+
+    # parse cli args
+    for o,a in opts:
+        if o in ("-p", "--project"):
+            project_name = a 
+        if o in ("-b", "--boostdir"):
+            boost_dir = a 
+        if o in ("-j", "--bjamdir"):
+            bjam_dir = a 
+        elif o in ("-h", "--help"):
+            usage()
+            exit()
+
+    # redeclare defaults if applicable
+    if not bjam_dir:
+        bjam_dir = os.path.join(boost_dir, "bjam")
+
+    # check stuff
+    if not project_name: raise Exception("Must Specify Project Name")
+    assert os.path.exists(boost_dir), "Boost Directory '%s' doesn't exist" %(str(boost_dir))
+    assert os.path.exists(bjam_dir), "Bjam Path '%s' doesn't exist" %(str(boost_dir))
+
+    # return args in a dict
+    results = {}
+    results["project_name"] = project_name
+    results["boost_dir"] = boost_dir
+    results["bjam_dir"] = boost_dir
+    return results
+
 if __name__ == "__main__":
     
-    project_name = get_args()
+    args = get_args()
+    project_name = args["project_name"]
     project_dir = create_dir(project_name)
 
 

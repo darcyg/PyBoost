@@ -11,11 +11,11 @@
 #include <boost/python.hpp>
 #include <fstream>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
+/*#include <boost/archive/text_oarchive.hpp>*/
+/*#include <boost/archive/text_iarchive.hpp>*/
+/*#include <boost/archive/binary_oarchive.hpp>*/
+/*#include <boost/archive/binary_iarchive.hpp>*/
+/*#include <boost/serialization/vector.hpp>*/
 
 extern "C" {
 #include "hiredis.h"
@@ -79,39 +79,8 @@ namespace intersect {
             }
 
         private:
-
-            friend class boost::serialization::access;
-            template <typename Archive> void serialize(Archive &ar, const unsigned int version) {
-                ar & x;
-                ar & y;
-                ar & scale;
-
-                ar & scale1;
-                ar & scale2;
-                ar & scale3;
-                ar & s1;
-                ar & s2;
-                ar & s3;
-                ar & s4;
-                ar & s5;
-                ar & s6;
-            }
     };
     typedef std::vector<Keypoint> KeypointVector;
-
-    /*---- Just for reference
-    namespace boost {
-        namespace serialization {
-
-            template<class Archive>
-                void serialize(Archive & ar, VFP::Common::ImageId & i, const unsigned int version)
-                {
-                    ar & i.callsign;
-                    ar & i.msTime;
-                }
-        }
-    }
-    */
 
     // Holds Image Data
     // -----------------------------------
@@ -162,32 +131,7 @@ namespace intersect {
 
             ~Image() {}
 
-            /*
-            std::string saveKeypoints() {
-                // serializes into str
-                std::ostringstream oss;
-                boost::archive::binary_oarchive oa(oss);
-                oa << keypoints;
-
-                return oss.str();
-                
-            }
-
-            void loadKeypoints(std::string load) {
-                // serializes into str
-                std::istringstream oss(load);
-                boost::archive::binary_iarchive ia(oss);
-                ia >> keypoints;
-                
-            }
-            */
-
         private:
-
-            friend class boost::serialization::access;
-            template <typename Archive> void serialize(Archive &ar, const unsigned int version) {
-                 
-            }
 
             void getData(boost::numpy::ndarray const &numpyData) {
                 if (numpyData.get_dtype() != boost::numpy::dtype::get_builtin<uint8_t>()) {

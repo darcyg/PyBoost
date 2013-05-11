@@ -7,13 +7,14 @@
 #include <iostream>
 #include "common/common.h"
 #include "detector/detector.h"
+#include "extractor/extractor.h"
 #include <fstream>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/serialization/vector.hpp>
+//#include <boost/archive/text_oarchive.hpp>
+//#include <boost/archive/text_iarchive.hpp>
+//#include <boost/archive/binary_oarchive.hpp>
+//#include <boost/archive/binary_iarchive.hpp>
+//#include <boost/serialization/vector.hpp>
 
 using namespace std;
 using namespace boost::python;
@@ -22,6 +23,7 @@ using intersect::Keypoint;
 using intersect::Image;
 
 using intersect::Detector;
+using intersect::Extractor;
 
 BOOST_PYTHON_MODULE(intersect)
 {
@@ -31,7 +33,7 @@ BOOST_PYTHON_MODULE(intersect)
     boost::numpy::initialize();  // have to put this in any module that uses Boost.NumPy
 
     // class Keypoint
-    class_<Keypoint>("Keypoint", init<float, float, float>())
+    class_<Keypoints>("Keypoint", init<float, float, float>())
         .def_readwrite("x", &Keypoint::x)
         .def_readwrite("y", &Keypoint::y)
         .def_readwrite("scale", &Keypoint::scale)
@@ -57,8 +59,13 @@ BOOST_PYTHON_MODULE(intersect)
     class_<Detector>("Detector")
         .def("detect", &Detector::detect)
         .def("fake_detect", &Detector::fakeDetect)
-        .def("loadKeypoints", &Detector::loadKeypoints)
-        .def("saveKeypoints", &Detector::saveKeypoints)
         .def_readwrite("keypoints", &Detector::keypoints)
+        ;
+
+    // class Extractor
+    class_<Extractor>("Extractor")
+        .def("extract", &Extractor::extract)
+        .def("getFeatures", &Extractor::getFeatures)
+        .def("fuckWithFeatures", &Extractor::fuckWithFeatures)
         ;
 }

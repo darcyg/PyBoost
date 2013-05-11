@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import intersect
-from intersect import Keypoint, Image, Detector
+from intersect import Keypoint, Image, Detector, Extractor
 import numpy as np
 
 #kps = [Keypoint(1.0, 2.0, 3.0),
@@ -22,17 +22,22 @@ detector.detect(image)
 keypoints = detector.keypoints
     
 filename = "keypoints.bin"
-#detector.saveKeypoints(filename)
-value = detector.saveKeypoints()
-
-keypoints[2] = Keypoint(1000,2000,3000)
-
-#detector.loadKeypoints(filename)
-detector.loadKeypoints(value)
-
 keypoints = detector.keypoints
 
-for kp in keypoints:
-    print kp
+# get features from keypoints
+extractor = Extractor()
+extractor.extract(keypoints)
 
-print data
+features = extractor.getFeatures()
+
+extractor.fuckWithFeatures()
+
+print ""
+
+print "Python:"
+print "------------------------------------"
+print features
+
+#for kp in keypoints:
+    #print kp
+
