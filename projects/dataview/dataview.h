@@ -13,36 +13,39 @@ namespace vfp {
     class Data {
         public:
             uint8_t* data; 
-            int rows;
-            int cols;
+            int m_rows;
+            int m_cols;
 
             Data() {}
 
+            // init data with stuff
             Data(uint8_t* _data, int _rows, int _cols) {
                 data = _data;
-                rows = _rows;
-                cols = _cols;
+                m_rows = _rows;
+                m_cols = _cols;
             }
 
+            // init data and fill in each cell with its index
             Data(int _rows, int _cols) {
-                rows = _rows;
-                cols = _cols;
+                m_rows = _rows;
+                m_cols = _cols;
                 data = new uint8_t[_rows*_cols]();
 
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < cols; j++) {
-                        int index = i * cols + j;
+                for (int i = 0; i < m_rows; i++) {
+                    for (int j = 0; j < m_cols; j++) {
+                        int index = i * m_cols + j;
                         data[index] = (uint8_t)index;
                     }
                 } 
             };
 
+            // print the data
             void print() {
                 cout << "\n[" << endl;
-                for (int i = 0; i < rows; i++) {
+                for (int i = 0; i < m_rows; i++) {
                     cout << "\t[ ";
-                    for (int j = 0; j < cols; j++) {
-                        int index = i * cols + j;
+                    for (int j = 0; j < m_cols; j++) {
+                        int index = i * m_cols + j;
                         cout << boost::format("%d,\t") % (int)data[index];
                     }
                     cout << "],\n" << endl;
@@ -52,77 +55,43 @@ namespace vfp {
     };
 
     template <class T>
-    class DataView {
+    class DataView : public Data {
         public:
-            
-            T* data;
-            int rows;
-            int cols;
 
-            // view a Data object
-            DataView(Data _data) {
-                rows = _data.rows; 
-                cols = _data.cols/sizeof(T);
-                this->data = reinterpret_cast<T*>(_data.data);
+            int cols() { return m_cols/sizeof(T); }
+            int rows() { return m_rows; }
+            void rows(int y) { m_rows = y; }
+            void cols(int x) { m_cols = x; }
+
+            T* view() {
+                return reinterpret_cast<T*>(data);
             }
-
-            Data getRawData() {
-                int newRows = rows;
-                int newCols = cols*sizeof(T);
-                uint8_t* newData = reinterpret_cast<uint8_t*>(data);
-
-                // TODO: Use memcpy or std::copy
-                Data d = Data(newRows, newCols);
-                for (int i = 0; i < newRows; i++) {
-                    for (int j = 0; j < newCols; j++) {
-                        int index = i * newCols + j;
-                        d.data[index] = newData[index];
-                    }
-                } 
-
-                return d;
-            }
-
-            // allocates mem 
-            DataView(int _rows, int _cols) {
-                rows = _rows;
-                cols = _cols;
-                data = new T[_rows*_cols]();
-            };
-
-            DataView(int _rows, int _cols, T defaultValue) {
-                rows = _rows;
-                cols = _cols;
-                data = new T[_rows*_cols]();
-                for (int i = 0; i < rows; i++) {
-                    for (int j = 0; j < cols; j++) {
-                        int index = i * cols + j;
-                        data[index] = index;
-                    }
-                } 
-            };
 
             int get(int y, int x) {
-                int index = x + y * cols;
-                return data[index];
+                T* m_data = view();
+                int index = x + y * cols();
+                return m_data[index];
             }
             int get(int y) {
-                int index = y * cols;
-                return data[index];
+                T* m_data = view();
+                int index = y * cols();
+                return m_data[index];
+            }
+            int set(int y, int x, T value) {
+                T* m_data = view();
+                int index = x + y * cols();
+                m_data[index] = value;
             }
 
-            // destructor 
-            ~DataView() {
-                delete data;
-            };
-
             void print() {
+                T* m_data = view();
+
                 cout << "\n[" << endl;
-                for (int i = 0; i < rows; i++) {
+                for (int i = 0; i < rows(); i++) {
                     cout << "\t[ ";
-                    for (int j = 0; j < cols; j++) {
-                        int index = i * cols + j;
-                        cout << boost::format("%d,\t") % data[index];
+                    for (int j = 0; j < cols(); j++) {
+                        int index = i * cols() + j;
+                        cout << boost::format("%d,\t") % m_data[index];
                     }
                     cout << "],\n" << endl;
                 }
