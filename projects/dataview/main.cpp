@@ -8,10 +8,23 @@
 using namespace std;
 using namespace vfp;
 
-int main() {
-    cout << "Starting" << endl;
+void initMat(Mat* d) {
+    for (int i = 0; i < d->rows<uint32_t>(); i++) {
+        for (int j = 0; j < d->cols<uint32_t>(); j++) {
+            d->at<uint32_t>(i, j) = i * d->cols<uint32_t>() + j;
+        }
+    } 
+}
 
-    Mat* d = new Mat(8,16);
+int main() {
+    cout << "Starting\n" << endl;
+    // ---------------------------------------------------------------------
+
+    //Mat* d = new Mat(7, 5, 0, 4);
+    Mat* d = new Mat(7, 5, VFP_INTEGER, VFP_32);
+
+    initMat(d);
+
     d->print<uint8_t>();
     d->print<uint32_t>();
 
@@ -29,6 +42,9 @@ int main() {
 
     d->print<uint32_t>();
 
-    cout << "Done" << endl;
+    delete d;
+
+    // ---------------------------------------------------------------------
+    cout << "\nDone\n" << endl;
     return 0;
 }
