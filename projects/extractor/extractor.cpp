@@ -35,10 +35,10 @@ BOOST_PYTHON_MODULE(extractor)
     def("extract", &blah);
 
     // class Keypoint
-    class_<Keypoint>("Keypoint", init<float, float, float>())
-        .def_readwrite("x", &Keypoint::x)
-        .def_readwrite("y", &Keypoint::y)
-        .def_readwrite("scale", &Keypoint::scale)
+    class_<Keypoint>("Keypoint", "This is the keypoint class", init<float, float, float>())
+        .def_readwrite("x", &Keypoint::x, "float x value")
+        .def_readwrite("y", &Keypoint::y, "float y value")
+        .def_readwrite("scale", &Keypoint::scale, "float scale value")
         .def("__repr__", &Keypoint::toString)
         ;
 }
